@@ -58,7 +58,7 @@ Thumbs.db
 *.log
 
 # Dataset / model outputs
-data/
+/data/
 datasets/
 runs/
 outputs/
