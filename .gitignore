@@ -72,5 +72,5 @@ weights/
 *.tflite
 
 # YOLO / ML common
-wandb/
+/wandb/
 mlruns/
