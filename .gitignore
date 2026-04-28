@@ -70,7 +70,4 @@ weights/
 *.onnx
 *.engine
 *.tflite
-
-# YOLO / ML common
-/wandb/
 mlruns/
