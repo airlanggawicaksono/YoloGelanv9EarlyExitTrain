@@ -25,6 +25,19 @@ from utils.plots import output_to_target, plot_images, plot_val_study
 from utils.torch_utils import select_device, smart_inference_mode
 
 
+def _select_final_pred_output(pred_output):
+    """
+    Normalize model prediction outputs for validation.
+    Supports:
+    - Tensor: already final prediction tensor [B, C, N]
+    - list/tuple of branch tensors: use last branch as final exit
+    """
+    if isinstance(pred_output, (list, tuple)):
+        if len(pred_output) and all(torch.is_tensor(x) for x in pred_output):
+            return pred_output[-1]
+    return pred_output
+
+
 def save_one_txt(predn, save_conf, shape, file):
     # Save one txt result
     gn = torch.tensor(shape)[[1, 0, 1, 0]]  # normalization gain whwh
@@ -189,8 +202,9 @@ def run(
         # Inference
         with dt[1]:
             preds, train_out = model(im) if compute_loss else (model(im, augment=augment), None)
-            preds = preds[2]
-            train_out = train_out[2]
+            preds = _select_final_pred_output(preds)
+            if train_out is not None:
+                train_out = _select_final_pred_output(train_out)
 
         # Loss
         #if compute_loss:
