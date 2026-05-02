@@ -40,6 +40,7 @@ htmlcov/
 *.ipynb
 !yolotrain.ipynb
 yolotrain.ipynb
+*.ipynb
 # IDE / editor
 .vscode/
 .idea/
