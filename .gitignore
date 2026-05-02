@@ -39,7 +39,7 @@ htmlcov/
 .ipynb_checkpoints/
 *.ipynb
 !yolotrain.ipynb
-
+yolotrain.ipynb
 # IDE / editor
 .vscode/
 .idea/
