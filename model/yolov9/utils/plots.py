@@ -78,12 +78,19 @@ class Annotator:
             self.im = im
         self.lw = line_width or max(round(sum(im.shape) / 2 * 0.003), 2)  # line width
 
+    def _text_size(self, text):
+        # Pillow>=10 removed FreeTypeFont.getsize(); use getbbox when available.
+        if hasattr(self.font, 'getbbox'):
+            left, top, right, bottom = self.font.getbbox(text)
+            return right - left, bottom - top
+        return self.font.getsize(text)
+
     def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255)):
         # Add one xyxy box to image with label
         if self.pil or not is_ascii(label):
             self.draw.rectangle(box, width=self.lw, outline=color)  # box
             if label:
-                w, h = self.font.getsize(label)  # text width, height
+                w, h = self._text_size(label)  # text width, height
                 outside = box[1] - h >= 0  # label fits outside box
                 self.draw.rectangle(
                     (box[0], box[1] - h if outside else box[1], box[0] + w + 1,
@@ -162,7 +169,7 @@ class Annotator:
     def text(self, xy, text, txt_color=(255, 255, 255), anchor='top'):
         # Add text to image (PIL-only)
         if anchor == 'bottom':  # start y from font bottom
-            w, h = self.font.getsize(text)  # text width, height
+            w, h = self._text_size(text)  # text width, height
             xy[1] += 1 - h
         self.draw.text(xy, text, fill=txt_color, font=self.font)
 

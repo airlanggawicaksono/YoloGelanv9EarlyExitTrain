@@ -10,6 +10,8 @@ from utils.tal.anchor_generator import dist2bbox, make_anchors, bbox2dist
 from utils.tal.assigner import TaskAlignedAssigner
 from utils.torch_utils import de_parallel
 
+USE_TORCH_AMP = hasattr(torch, 'amp') and hasattr(torch.amp, 'autocast')
+
 
 def smooth_BCE(eps=0.1):  # https://github.com/ultralytics/yolov3/issues/238#issuecomment-598028441
     # return positive, negative label smoothing BCE targets
@@ -23,7 +25,11 @@ class VarifocalLoss(nn.Module):
 
     def forward(self, pred_score, gt_score, label, alpha=0.75, gamma=2.0):
         weight = alpha * pred_score.sigmoid().pow(gamma) * (1 - label) + gt_score * label
-        with torch.cuda.amp.autocast(enabled=False):
+        if USE_TORCH_AMP:
+            amp_context = torch.amp.autocast('cuda', enabled=False)
+        else:
+            amp_context = torch.cuda.amp.autocast(enabled=False)
+        with amp_context:
             loss = (F.binary_cross_entropy_with_logits(pred_score.float(), gt_score.float(),
                                                        reduction="none") * weight).sum()
         return loss

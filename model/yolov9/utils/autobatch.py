@@ -6,10 +6,16 @@ import torch
 from utils.general import LOGGER, colorstr
 from utils.torch_utils import profile
 
+USE_TORCH_AMP = hasattr(torch, 'amp') and hasattr(torch.amp, 'autocast')
+
 
 def check_train_batch_size(model, imgsz=640, amp=True):
     # Check YOLOv5 training batch size
-    with torch.cuda.amp.autocast(amp):
+    if USE_TORCH_AMP:
+        amp_context = torch.amp.autocast('cuda', enabled=amp)
+    else:
+        amp_context = torch.cuda.amp.autocast(enabled=amp)
+    with amp_context:
         return autobatch(deepcopy(model).train(), imgsz)  # compute optimal batch size
 
 
