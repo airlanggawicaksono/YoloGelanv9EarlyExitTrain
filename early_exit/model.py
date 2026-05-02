@@ -25,9 +25,9 @@ class EarlyExitModel(DetectionModel):
     Compatible with loss_tal_triple.ComputeLoss when n_exits == 3.
     """
 
-    def __init__(self, cfg, ch=3, nc=None):
+    def __init__(self, cfg, ch=3, nc=None, anchors=None):
         self._init_mode = True
-        super().__init__(cfg, ch, nc)
+        super().__init__(cfg, ch, nc, anchors)
         self._init_mode = False
         self._reinit_exit_heads(ch)
 
